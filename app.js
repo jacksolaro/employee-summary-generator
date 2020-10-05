@@ -13,6 +13,64 @@ const render = require("./lib/htmlRenderer");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+inquirer
+    .prompt([
+        /* Pass your questions in here */
+        {
+            name: "name",
+            type: "input",
+            message: "Please enter the employee's first and last name: ",
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "What do you want",
+            choices: ["Intern", "Engineer", "Manager"]
+        },
+        {
+            name: "id",
+            type: "input",
+            message: "Please enter the employee's ID: ",
+            choices: ["Calzone", "Pizza", "Sub"]
+        },
+        {
+            name: "internSchool",
+            type: "input",
+            message: "What school does this intern go to?",
+            when: function (answers) {
+                // Only run if user answered Intern as Role
+                return answers.role === "Intern";
+            }
+        },
+        {
+            name: "engineerGithub",
+            type: "input",
+            message: "Please enter the employee's GitHub URL: ",
+            when: function (answers) {
+                // Only run if user answered Engineer as Role
+                return answers.role === "Engineer";
+            }
+        },
+        {
+            name: "managerOfficeNumber",
+            type: "input",
+            message: "Please enter the manager's office number: ",
+            when: function (answers) {
+                // Only run if user answered Manager as Role
+                return answers.role === "Manager";
+            }
+        }
+    ])
+    .then(answers => {
+        console.log(answers)
+    })
+    .catch(error => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+        } else {
+            // Something else when wrong
+        }
+    });
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
