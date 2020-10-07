@@ -9,6 +9,7 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
+const { Console } = require("console");
 
 const teamArr = [];
 
@@ -36,6 +37,11 @@ function buildTeam() {
                 message: "Please enter the employee's ID: ",
             },
             {
+                name: "email",
+                type: "input",
+                message: "Please enter the employee's email address: ",
+            },
+            {
                 name: "internSchool",
                 type: "input",
                 message: "What school does this intern go to?",
@@ -61,17 +67,58 @@ function buildTeam() {
                     // Only run if user answered Manager as Role
                     return answers.role === "Manager";
                 }
+            },
+            {
+                name: "isMoreEmployees",
+                type: "list",
+                message: "Would you like to add another employee?",
+                choices: [
+                    {
+                        name: "Yes",
+                        value: true
+                    },
+                    {
+                        name: "No",
+                        value: false
+                    }
+                ]
             }
         ])
         .then(answers => {
-            console.log(answers)
-    
-            // Add team member to Team array
-            teamArr.push(answers)
-    
-            console.log(teamArr)
-            // Run Again
-            buildTeam();
+
+            switch (answers.role) {
+                case "Manager":
+                    const newManager = new Manager(answers.name, answers.id, answers.email, answers.managerOfficeNumber)
+                    teamArr.push(newManager);
+                    break;
+                case "Engineer":
+                    const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.engineerGithub)
+                    teamArr.push(newEngineer);
+                    break;
+                case "Intern":
+                    const newIntern = new Intern(answers.name, answers.id, answers.email, answers.internSchool)
+                    teamArr.push(newIntern);
+                    break;
+            }
+
+            console.log(teamArr);
+
+            if (answers.isMoreEmployees) {
+                buildTeam();
+            } else {
+
+                // Render the HTML
+                const renderedHtml = render(teamArr);
+
+                // Wirte to File
+                fs.writeFile("./output/team.html", renderedHtml, function (err) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                    console.log("Success! ");
+                })
+            }
+
         })
         .catch(error => {
             if (error.isTtyError) {
